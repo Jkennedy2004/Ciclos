@@ -1,3 +1,54 @@
+# name: CI/CD Pipeline
+
+# on:
+#   push:
+#     branches:
+#       - master
+#   pull_request:
+#     branches:
+#       - master
+
+# jobs:
+#   build-and-test:
+#     name: Build, test, and analyze
+#     runs-on: ubuntu-latest
+#     steps:
+#       # --- [1] Checkout code ---
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       # --- [2] SAST (Static Analysis with SonarQube) ---
+#       - name: SonarCloud Scan
+#         uses: SonarSource/sonarqube-scan-action@master
+#         env:
+#           # Estos son secretos que se configuran en GitHub
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+#           SONAR_HOST_URL: "https://sonarcloud.io"
+#         with:
+#           projectBaseDir: .
+#           args: >
+#             -Dsonar.projectKey=Jkennedy2004_Ciclos
+#             -Dsonar.organization=jkennedy2004
+
+#       # --- [3] SCA (Software Composition Analysis with Snyk) ---
+#       - name: Snyk Scan
+#         uses: snyk/actions/python@master
+#         env:
+#           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+#       # --- [4] IaC (Infrastructure as Code) Scan with Checkov ---
+#       - name: Checkov Scan
+#         uses: bridgecrewio/checkov-action@master
+#         with:
+#           directory: .
+#           quiet: true
+#           framework: all
+#           output_format: cli
+#           # La API key es necesaria para usar algunas características de Checkov
+#           api-key: ${{ secrets.BC_API_KEY }}
+
+
 name: CI/CD Pipeline
 
 on:
@@ -12,12 +63,20 @@ jobs:
   build-and-test:
     name: Build, test, and analyze
     runs-on: ubuntu-latest
+    # Este bloque define explícitamente los permisos para el trabajo,
+    # solucionando la vulnerabilidad de seguridad CKV2_GHA_1.
+    # Concede acceso de 'lectura' al contenido del repositorio y de 'escritura'
+    # a las solicitudes de extracción (pull requests), lo cual es necesario para
+    # que SonarCloud pueda publicar verificaciones de estado.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      # --- [1] Checkout code ---
+      # --- [1] Obtener el código ---
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # --- [2] SAST (Static Analysis with SonarQube) ---
+      # --- [2] SAST (Análisis estático con SonarQube) ---
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@master
         env:
@@ -31,13 +90,13 @@ jobs:
             -Dsonar.projectKey=Jkennedy2004_Ciclos
             -Dsonar.organization=jkennedy2004
 
-      # --- [3] SCA (Software Composition Analysis with Snyk) ---
+      # --- [3] SCA (Análisis de composición de software con Snyk) ---
       - name: Snyk Scan
         uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      # --- [4] IaC (Infrastructure as Code) Scan with Checkov ---
+      # --- [4] Escaneo de IaC (Infraestructura como código) con Checkov ---
       - name: Checkov Scan
         uses: bridgecrewio/checkov-action@master
         with:
@@ -45,5 +104,5 @@ jobs:
           quiet: true
           framework: all
           output_format: cli
-          # La API key es necesaria para usar algunas características de Checkov
+          # La clave API es necesaria para usar algunas características de Checkov
           api-key: ${{ secrets.BC_API_KEY }}
