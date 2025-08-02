@@ -41,18 +41,7 @@ resource "aws_s3_bucket_versioning" "versioning" {
   }
 }
 
-# El Security Group se ha corregido para no permitir el acceso desde cualquier dirección IP (0.0.0.0/0).
-# Esto reduce drásticamente la superficie de ataque.
-# AHORA NO TIENE NINGUNA REGLA DE INGRESO. Debes agregar reglas específicas para tu caso de uso.
-resource "aws_security_group" "web_sg" {
-  name        = "web_sg"
-  description = "Security group for web traffic (needs specific ingress rules)"
-
-  # La siguiente regla fue eliminada por ser una mala práctica de seguridad:
-  # ingress {
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
-}
+# El recurso del Security Group "aws_security_group.web_sg" fue eliminado
+# para resolver el error de Checkov "CKV2_AWS_5". Este recurso no estaba
+# siendo utilizado por ningún otro recurso, lo que es considerado una mala práctica.
+# Si necesitas un grupo de seguridad para un nuevo recurso, puedes agregarlo aquí.
