@@ -30,7 +30,7 @@ jobs:
       # --- [2] SCA (Software Composition Analysis with Snyk) ---
       # Asegúrate de configurar el secreto de Snyk en tu repositorio.
       - name: Run Snyk scan
-        uses: snyk/actions/python-3-slim@master
+        uses: snyk/actions/python@master # Línea corregida
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
