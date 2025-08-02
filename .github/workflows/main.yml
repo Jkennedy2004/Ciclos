@@ -1,0 +1,63 @@
+name: DevSecOps Demo CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # --- [1] SAST (Static Analysis with SonarQube) ---
+      # Asume que tienes un SonarQube self-hosted o en la nube.
+      # Para la demo, puedes usar un step que simule un scan o conectar a una instancia real.
+      - name: Run SonarQube analysis
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        with:
+          projectBaseDir: .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }} # Asegúrate de configurar este secreto
+          SONAR_HOST_URL: "http://your-sonarqube-instance.com"
+      
+      # --- [2] SCA (Software Composition Analysis with Snyk) ---
+      # Asegúrate de configurar el secreto de Snyk en tu repositorio.
+      - name: Run Snyk scan
+        uses: snyk/actions/python-3-slim@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=requirements.txt
+
+      # --- [3] IaC Security (Infrastructure as Code with Checkov) ---
+      - name: Run Checkov IaC scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: IaC/terraform/
+          soft_fail: true # Permite que el pipeline continúe incluso si encuentra vulnerabilidades
+
+      # --- [4] Build Docker image ---
+      - name: Build and tag Docker image
+        run: docker build -t devsecops-demo:latest .
+
+      # --- [5] DAST (Dynamic Analysis with OWASP ZAP) ---
+      # Necesitas que la aplicación esté corriendo para hacer DAST.
+      # Una forma simple es usar un contenedor de docker-compose para levantar la app.
+      - name: Run the application
+        run: docker-compose up -d
+      
+      - name: Wait for application to be ready
+        run: sleep 20 # Espera a que la app esté lista
+
+      - name: Run OWASP ZAP scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          target: 'http://localhost:5000'
+          # Puedes configurar reglas, contextos, etc. para un escaneo más detallado.

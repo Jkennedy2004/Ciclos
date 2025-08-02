@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>DevSecOps Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a la demostración de DevSecOps</h1>
+    <p>
+        Esta es una aplicación web de prueba con vulnerabilidades intencionadas.<br>
+        El objetivo es mostrar cómo las herramientas de seguridad integradas en un pipeline de CI/CD pueden detectar estos problemas.
+    </p>
+    <p>
+        Puedes interactuar con los siguientes endpoints para ver las vulnerabilidades en acción:<br>
+        <ul>
+            <li>
+                **Vulnerabilidad de inyección de comandos:** <a href="/insecure_route?command=ls">/insecure_route?command=ls</a>
+            </li>
+            <li>
+                **Simulación de inyección SQL y cookie insegura:** Usa el siguiente formulario de inicio de sesión
+                <form action="/login" method="post">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" value="admin"><br><br>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" value="password"><br><br>
+                    <input type="submit" value="Iniciar Sesión">
+                </form>
+            </li>
+        </ul>
+    </p>
+</body>
+</html>
