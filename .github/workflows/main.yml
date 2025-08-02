@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build-and-test:
@@ -29,7 +29,7 @@ jobs:
           projectBaseDir: .
           args: >
             -Dsonar.projectKey=Jkennedy2004_Ciclos
-            -Dsonar.organization=Jkennedy2004
+            -Dsonar.organization=jkennedy2004
 
       # --- [3] SCA (Software Composition Analysis with Snyk) ---
       - name: Snyk Scan
